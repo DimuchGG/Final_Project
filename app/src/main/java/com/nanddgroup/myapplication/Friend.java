@@ -14,6 +14,27 @@ public class Friend {
         this.imageID = imageID;
     }
 
+    public String getsName() {
+        return sName;
+    }
 
+    public void setsName(String sName) {
+        this.sName = sName;
+    }
 
+    public int getImageID() {
+        return imageID;
+    }
+
+    public void setImageID(int imageID) {
+        this.imageID = imageID;
+    }
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
 }
