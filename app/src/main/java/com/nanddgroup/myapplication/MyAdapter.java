@@ -30,7 +30,7 @@ public class MyAdapter extends ArrayAdapter<Friend> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        Toast.makeText(getContext(), ""+position, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getContext(), ""+position, Toast.LENGTH_SHORT).show();
         View view = null;
         if (convertView == null) {
             LayoutInflater lInflater = (LayoutInflater) ctx
