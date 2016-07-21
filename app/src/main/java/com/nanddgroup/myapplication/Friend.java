@@ -8,13 +8,11 @@ public class Friend {
     private String sName;
     private int imageID;
     private Boolean status;
-    private MyFragment myFragment;
 
     public Friend(String sName, int imageID) {
         this.sName = sName;
         this.imageID = imageID;
         this.status = false;
-        this.myFragment = new MyFragment();
     }
 
     public String getsName() {
@@ -41,11 +39,4 @@ public class Friend {
         this.status = status;
     }
 
-    public MyFragment getMyFragment() {
-        return myFragment;
-    }
-
-    public void setMyFragment(MyFragment myFragment) {
-        this.myFragment = myFragment;
-    }
 }
