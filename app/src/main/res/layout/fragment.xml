@@ -1,13 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <ListView
-        android:id="@+id/lvDialog"
+        android:id="@id/android:list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#00ff00" />
+        android:layout_above="@+id/llSendMessage"
+        android:layout_alignParentTop="true"
+        android:background="#850000ff"
+        android:stackFromBottom="true"
+        android:divider="#00000000"/>
 
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/llSendMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="center_horizontal|bottom"
+        android:orientation="horizontal"
+        android:weightSum="10">
+
+        <EditText
+            android:id="@+id/etMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="9"
+            android:textSize="24sp" />
+
+        <ImageView
+            android:id="@+id/ivSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="clickSend"
+            android:src="@drawable/send" />
+    </LinearLayout>
+</RelativeLayout>

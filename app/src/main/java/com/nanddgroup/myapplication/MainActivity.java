@@ -1,7 +1,7 @@
 package com.nanddgroup.myapplication;
 
-import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -10,17 +10,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity{
 
-
+    MyFragment myFragment;
+    String sFriendName;
+    private boolean fragmentAdd = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,14 +30,52 @@ public class MainActivity extends AppCompatActivity{
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         ListView lvFriends = (ListView) findViewById(R.id.lvFriends);
-        final ArrayList<Friend> alFriends = new ArrayList<Friend>();
+        final ArrayList<Friend> alFriends = new ArrayList<>();
+        fillFriendList(alFriends);
+        final FriendAdapter friendAdapter = new FriendAdapter(getApplicationContext(),
+                R.layout.custom_friend, alFriends);
+        lvFriends.setAdapter(friendAdapter);
+
+
+        lvFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getApplicationContext(), alFriends.get(position).getsName(), Toast.LENGTH_SHORT).show();
+
+                sFriendName = alFriends.get(position).getsName();
+                myFragment = new MyFragment();
+
+                if (!fragmentAdd) {
+                    fragmentAdd = true;
+                    getFragmentManager().beginTransaction()
+                            .replace(R.id.contentMain, myFragment)
+                            .commit();
+                }
+                drawer.closeDrawers();
+                setTitle(sFriendName);
+            }
+        });
+//        ((TextView) view.findViewById(R.id.tvName)).getText()
+//        Toast.makeText(getBaseContext(),"ChangeListener", Toast.LENGTH_SHORT).show();
+    }
+
+
+    public void clickSend(View v) {
+//        Toast.makeText(getBaseContext(), sFriendName, Toast.LENGTH_SHORT).show();
+        TextView etMessage = (TextView) findViewById(R.id.etMessage);
+//        myFragment.updateList(new Message(getImageID(sFriendName), etMessage.getText().toString()));
+        myFragment.updateList(new Message(R.drawable.send, etMessage.getText().toString()));
+        etMessage.setText(null);
+    }
+
+    private void fillFriendList(ArrayList<Friend> alFriends) {
         alFriends.add(new Friend("", getImageID("")));
         alFriends.add(new Friend("Petya", getImageID("Petya")));
         alFriends.add(new Friend("Kolya", getImageID("Kolya")));
@@ -50,41 +89,6 @@ public class MainActivity extends AppCompatActivity{
         alFriends.add(new Friend("stas", getImageID("stas")));
         alFriends.add(new Friend("nikita", getImageID("nikita")));
         alFriends.add(new Friend("1nikita", getImageID("1nikita")));
-        final MyAdapter myAdapter = new MyAdapter(getApplicationContext(),
-                R.layout.custom_friend, alFriends);
-        lvFriends.setAdapter(myAdapter);
-
-        final FragmentTransaction fTrans;
-        fTrans = getFragmentManager().beginTransaction();
-
-//        ListView lvDialog = (ListView) findViewById(R.id.lvDialog);
-//        final ArrayList<String> alString = new ArrayList<String>();
-//        alString.add("123");
-//        alString.add("456");
-//        alString.add("789");
-//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-//                R.layout.custom_message, alString);
-//        lvDialog.setAdapter(adapter);
-
-        final MyFragment myFragment;
-        myFragment = new MyFragment();
-
-        lvFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), alFriends.get(position).getsName(), Toast.LENGTH_SHORT).show();
-
-//                fTrans.replace(R.id.contentMain, alFriends.get(position).getMyFragment());
-                fTrans.replace(R.id.contentMain, myFragment);
-                fTrans.commit();
-            }
-        });
-
-//        ((TextView) view.findViewById(R.id.tvName)).getText()
-//        Toast.makeText(getBaseContext(),"ChangeListener", Toast.LENGTH_SHORT).show();
-
-
-
     }
 
     public int getImageID(String sName) {
