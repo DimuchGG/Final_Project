@@ -1,27 +1,43 @@
 package com.nanddgroup.myapplication;
 
 import android.os.Bundle;
-import android.support.annotation.StringRes;
-import android.view.View;
+import android.support.annotation.Nullable;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.neovisionaries.ws.client.WebSocket;
+import com.neovisionaries.ws.client.WebSocketAdapter;
+import com.neovisionaries.ws.client.WebSocketException;
+import com.neovisionaries.ws.client.WebSocketFactory;
+import com.neovisionaries.ws.client.WebSocketFrame;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity{
 
+    private static final String TAG = "WS";
+    private static final int TIMEOUT = 5000;
+    private static final String BASE_URL_SOCKET = "socket";
     MyFragment myFragment;
     String sFriendName;
     private boolean fragmentAdd = false;
+    @Nullable
+    private WebSocket ws;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +80,43 @@ public class MainActivity extends AppCompatActivity{
         });
 //        ((TextView) view.findViewById(R.id.tvName)).getText()
 //        Toast.makeText(getBaseContext(),"ChangeListener", Toast.LENGTH_SHORT).show();
+        Button bWS = (Button) findViewById(R.id.bWS);
+
+        bWS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                try {
+                    ws = new WebSocketFactory()
+                            .createSocket(BASE_URL_SOCKET, TIMEOUT)
+                            .addListener(new WebSocketAdapter() {
+                                @Override
+                                public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
+                                    Log.e(TAG, "Status: Connected to " + BASE_URL_SOCKET);
+                                }
+
+                                @Override
+                                public void onError(WebSocket websocket, WebSocketException cause) throws Exception {
+                                    Log.e(TAG, "Status: Error " + cause);
+                                }
+
+                                @Override
+                                public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
+                                    Log.e(TAG, "Status: Disconnected ");
+                                }
+
+                                @Override
+                                public void onTextMessage(WebSocket websocket, String text) throws Exception {
+                                    Log.e(TAG, "Status: Text Message received" + text);
+                                }
+                            })
+                            .connectAsynchronously();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
     }
 
 
