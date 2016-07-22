@@ -16,12 +16,12 @@ import java.util.List;
 /**
  * Created by Dimuch on 16.07.2016.
  */
-public class MyAdapter extends ArrayAdapter<Friend> {
+public class FriendAdapter extends ArrayAdapter<Friend> {
 
     Context ctx;
     ArrayList<Friend> alFriends;
 
-    public MyAdapter(Context context, int resource, ArrayList<Friend> objects1) {
+    public FriendAdapter(Context context, int resource, ArrayList<Friend> objects1) {
         super(context, resource, objects1);
         this.ctx = context;
         alFriends = objects1;
