@@ -29,13 +29,17 @@ public class MessageAdapter extends ArrayAdapter<Message> {
     if (convertView == null) {
       LayoutInflater lInflater = (LayoutInflater) ctx
               .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-      view = lInflater.inflate(R.layout.custom_message, parent, false);
+      if (alMessage.get(position).isItIsMe()) {
+        view = lInflater.inflate(R.layout.my_custom_message, parent, false);
+      } else {
+        view = lInflater.inflate(R.layout.custom_message, parent, false);
+      }
     } else {
       view = convertView;
     }
 
-    TextView tvName = (TextView) view.findViewById(R.id.tvName);
-    tvName.setText(alMessage.get(position).getName());
+//    TextView tvName = (TextView) view.findViewById(R.id.tvName);
+//    tvName.setText(alMessage.get(position).getName());
 
     ImageView ivFriendMessage = (ImageView) view.findViewById(R.id.ivFriendMessage);
     ivFriendMessage.setImageResource(alMessage.get(position).getImageID());

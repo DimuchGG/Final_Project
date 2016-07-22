@@ -4,36 +4,36 @@
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/tvName"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Large Text"
-        android:textSize="32sp"
-        android:visibility="gone"/>
+        android:layout_alignParentLeft="true">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/ivFriendMessage"
-        android:layout_alignParentTop="false"
-        android:layout_alignParentLeft="true" />
+        <ImageView
+            android:id="@+id/ivFriendMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/tvMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Message"
-        android:textSize="32sp"
-        android:layout_toRightOf="@+id/ivFriendMessage"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp" />
+        <TextView
+            android:id="@+id/tvMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/google"
+            android:maxWidth="240dp"
+            android:text="Message"
+            android:textColor="#ffffff"
+            android:textSize="24sp" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tvTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
         android:text="Time"
-        android:textSize="24sp"
-        android:layout_alignParentRight="true" />
+        android:textSize="24sp" />
+
 </RelativeLayout>
