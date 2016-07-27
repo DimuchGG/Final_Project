@@ -10,4 +10,6 @@
     tools:context="com.nanddgroup.myapplication.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+
+
 </LinearLayout>

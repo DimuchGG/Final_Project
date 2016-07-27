@@ -1,7 +1,8 @@
 package com.nanddgroup.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
@@ -12,17 +13,28 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+
+import com.nanddgroup.myapplication.adapters.FriendAdapter;
+import com.nanddgroup.myapplication.item_list.Friend;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity{
+    @BindView(R.id.lvFriends) ListView lvFriends;
+    @BindView(R.id.drawerLayout) DrawerLayout drawerLayout;
+    @BindView(R.id.header) LinearLayout header;
 
     private MyFragment myFragment;
+    private MyDialog myDialog;
     private boolean fragmentAdd = false;
-    private int idFriendLogo;
+    public static Profile myProfile;
+    private ArrayList<Friend> alFriends;
+    private ArrayList<Profile> alProfiles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,72 +42,72 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        ButterKnife.bind(this);
 
         //хз что тут происходит
-        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        drawer.openDrawer(Gravity.LEFT);
+                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.setDrawerListener(toggle);
+        drawerLayout.openDrawer(Gravity.LEFT);
         toggle.syncState();
 
-        //
-        ListView lvFriends = (ListView) findViewById(R.id.lvFriends);
-        final ArrayList<Friend> alFriends = new ArrayList<>();
-        fillFriendList(alFriends);
+        //список активных друзей
+        alFriends = new ArrayList<>();
+        fillFriendList();
         lvFriends.setAdapter(new FriendAdapter(getApplicationContext(),
                 R.layout.custom_friend, alFriends));
+
+        //список профайлов
+        myProfile = new Profile();
+        fillMyProfile();
+        alProfiles = new ArrayList<>();
+        alProfiles.add(myProfile);
 
         myFragment = new MyFragment();
 
         lvFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                idFriendLogo = alFriends.get(position).getImageID();
-
                 if (!fragmentAdd) {
                     fragmentAdd = true;
                     getFragmentManager().beginTransaction()
                             .replace(R.id.contentMain, myFragment)
                             .commit();
                 }
-
-                drawer.closeDrawers();
+                drawerLayout.closeDrawers();
                 setTitle(alFriends.get(position).getsName());
+            }
+        });
+
+        header.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                startActivity(intent);
             }
         });
     }
 
-
-    public void clickSend(View v) {
-//        Toast.makeText(getBaseContext(), sFriendName, Toast.LENGTH_SHORT).show();
-        TextView etMessage = (TextView) findViewById(R.id.etMessage);
-        switch (v.getId()) {
-            case R.id.ivSend:
-                myFragment.updateList(new Message(R.drawable.my_logo, etMessage.getText().toString(), true));
-                etMessage.setText(null);
-                break;
-            case R.id.bSendFriend:
-                myFragment.updateList(new Message(idFriendLogo, "Friend message", false));
-                break;
-        }
+    private void fillMyProfile() {
+        myProfile.setsName("User");
+        myProfile.setImageID(R.drawable.my_logo);
+        myProfile.setStatus("Status");
     }
 
-    private void fillFriendList(ArrayList<Friend> alFriends) {
-        alFriends.add(new Friend("", getImageID()));
-        alFriends.add(new Friend("Petya", getImageID()));
-        alFriends.add(new Friend("Kolya", getImageID()));
-        alFriends.add(new Friend("Dimuch", getImageID()));
-        alFriends.add(new Friend("Stas", getImageID()));
-        alFriends.add(new Friend("Nikita", getImageID()));
-        alFriends.add(new Friend("vasya", getImageID()));
-        alFriends.add(new Friend("petya", getImageID()));
-        alFriends.add(new Friend("kolya", getImageID()));
-        alFriends.add(new Friend("dimuch", getImageID()));
-        alFriends.add(new Friend("stas", getImageID()));
-        alFriends.add(new Friend("nikita", getImageID()));
-        alFriends.add(new Friend("1nikita", getImageID()));
+    private void fillFriendList() {
+        alFriends.add(new Friend("Vasya", getImageID()));
+//        alFriends.add(new Friend("Petya", getImageID()));
+//        alFriends.add(new Friend("Kolya", getImageID()));
+//        alFriends.add(new Friend("Dimuch", getImageID()));
+//        alFriends.add(new Friend("Stas", getImageID()));
+//        alFriends.add(new Friend("Nikita", getImageID()));
+//        alFriends.add(new Friend("vasya", getImageID()));
+//        alFriends.add(new Friend("petya", getImageID()));
+//        alFriends.add(new Friend("kolya", getImageID()));
+//        alFriends.add(new Friend("dimuch", getImageID()));
+//        alFriends.add(new Friend("stas", getImageID()));
+//        alFriends.add(new Friend("nikita", getImageID()));
+//        alFriends.add(new Friend("1nikita", getImageID()));
     }
 
     public int getImageID() {
@@ -138,9 +150,8 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -162,6 +173,10 @@ public class MainActivity extends AppCompatActivity{
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+
+            myDialog = new MyDialog();
+            myDialog.show(getFragmentManager(), "tag");
+            Log.wtf("my", "set");
             return true;
         }
 
