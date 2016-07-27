@@ -13,11 +13,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.nanddgroup.myapplication.adapters.FriendAdapter;
 import com.nanddgroup.myapplication.item_list.Friend;
+import com.nanddgroup.myapplication.item_list.Profile;
+import com.nanddgroup.myapplication.socket.Client;
 
 import java.util.ArrayList;
 
@@ -28,13 +31,12 @@ public class MainActivity extends AppCompatActivity{
     @BindView(R.id.lvFriends) ListView lvFriends;
     @BindView(R.id.drawerLayout) DrawerLayout drawerLayout;
     @BindView(R.id.header) LinearLayout header;
+    @BindView(R.id.bConnectServer) Button bConnectServer;
 
-    private MyFragment myFragment;
     private MyDialog myDialog;
-    private boolean fragmentAdd = false;
     public static Profile myProfile;
     private ArrayList<Friend> alFriends;
-    private ArrayList<Profile> alProfiles;
+    public static Client client = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +46,17 @@ public class MainActivity extends AppCompatActivity{
         setSupportActionBar(toolbar);
         ButterKnife.bind(this);
 
+        if (ProfileActivity.isProfileOpen) {
+            ProfileActivity.isProfileOpen = false;
+            Intent intent = new Intent(this, ProfileActivity.class);
+            startActivity(intent);
+        }
+
         //хз что тут происходит
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.setDrawerListener(toggle);
-        drawerLayout.openDrawer(Gravity.LEFT);
+//        drawerLayout.openDrawer(Gravity.LEFT);
         toggle.syncState();
 
         //список активных друзей
@@ -60,20 +68,10 @@ public class MainActivity extends AppCompatActivity{
         //список профайлов
         myProfile = new Profile();
         fillMyProfile();
-        alProfiles = new ArrayList<>();
-        alProfiles.add(myProfile);
-
-        myFragment = new MyFragment();
 
         lvFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (!fragmentAdd) {
-                    fragmentAdd = true;
-                    getFragmentManager().beginTransaction()
-                            .replace(R.id.contentMain, myFragment)
-                            .commit();
-                }
                 drawerLayout.closeDrawers();
                 setTitle(alFriends.get(position).getsName());
             }
@@ -82,8 +80,14 @@ public class MainActivity extends AppCompatActivity{
         header.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                startActivity(intent);
+                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+            }
+        });
+
+        bConnectServer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMyDialog();
             }
         });
     }
@@ -95,7 +99,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void fillFriendList() {
-        alFriends.add(new Friend("Vasya", getImageID()));
+        alFriends.add(new Friend(new Profile()));
 //        alFriends.add(new Friend("Petya", getImageID()));
 //        alFriends.add(new Friend("Kolya", getImageID()));
 //        alFriends.add(new Friend("Dimuch", getImageID()));
@@ -172,15 +176,28 @@ public class MainActivity extends AppCompatActivity{
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.abSettings) {
 
-            myDialog = new MyDialog();
-            myDialog.show(getFragmentManager(), "tag");
-            Log.wtf("my", "set");
+            showMyDialog();
+//            Log.wtf("my", "set");
+            return true;
+        }
+        if (id == R.id.abDisconnect) {
+
+            if(client==null){
+                return true;
+            }
+            client.disconnect();
+//            Log.wtf("my", "dis");
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showMyDialog() {
+        myDialog = new MyDialog();
+        myDialog.show(getFragmentManager(), "tag");
     }
 
 }

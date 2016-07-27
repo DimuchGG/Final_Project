@@ -29,7 +29,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="9"
             android:maxHeight="96dp"
-            android:textSize="24sp" />
+            android:textSize="24sp"
+            android:hint="Message"/>
 
         <ImageView
             android:id="@+id/ivSend"

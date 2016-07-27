@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -47,9 +49,23 @@ public class MyFragment extends ListFragment {
         ivSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!etMessage.getText().toString().equals("")) {
-                    updateList(new Message(R.drawable.my_logo,
-                            etMessage.getText().toString(), true));
+
+                Animation anim = null;
+                anim = AnimationUtils.loadAnimation(getActivity(),R.anim.anim);
+                ivSend.startAnimation(anim);
+//                if (!etMessage.getText().toString().equals("")) {
+                if (true) {
+
+                    if(MainActivity.client==null){
+                        return;
+                    }
+
+                    Message message = new Message(R.drawable.my_logo,
+                            etMessage.getText().toString(), true);
+
+                    MainActivity.client.sendMsg(message);
+
+                    updateList(message);
                     etMessage.setText(null);
 
                     InputMethodManager imm = (InputMethodManager) getActivity()
@@ -67,7 +83,7 @@ public class MyFragment extends ListFragment {
             }
         });
 
-        Log.wtf("my", "test");
+//        Log.wtf("my", "test");
         return view;
     }
 

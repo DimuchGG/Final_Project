@@ -1,7 +1,9 @@
 package com.nanddgroup.myapplication.item_list;
 
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Dimuch on 20.07.2016.
@@ -21,23 +23,12 @@ public class Message {
         calendar = Calendar.getInstance();
 
         this.message = message;
-        this.time = formatTime();
+        this.time = (new SimpleDateFormat("HH:mm")).format(new Date(System.currentTimeMillis()));
         this.imageID = imageID;
         this.itIsMe = itIsMe;
     }
 
-    private String formatTime() {
-        int iHour = calendar.get(Calendar.HOUR_OF_DAY);
-        int iMin = calendar.get(Calendar.MINUTE);
-        String sHour = String.valueOf(iHour);
-        String sMin = String.valueOf(iMin);
-        if ( iHour < 10 ) {
-            sHour = "0" + String.valueOf(iHour);
-        }
-        if ( iMin < 10 ) {
-            sMin = "0" + String.valueOf(iHour);
-        }
-        return sHour + ":" + sMin;
+    public Message() {
     }
 
     public boolean isItIsMe() {

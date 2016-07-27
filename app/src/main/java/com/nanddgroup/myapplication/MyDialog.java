@@ -25,12 +25,13 @@ public class MyDialog extends DialogFragment {
     @BindView(R.id.etIP) EditText etIP;
     @BindView(R.id.bConnect) Button bConnect;
     @BindView(R.id.bBack) Button bBack;
-    MyDialog myDialog;
 
-    private Client client;
+    public static MyFragment myFragment;
+    MyDialog myDialog;
 
     public MyDialog() {
         myDialog = this;
+        myFragment = new MyFragment();
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,11 +60,19 @@ public class MyDialog extends DialogFragment {
 //                loginPanel.setVisibility(View.GONE);
 //                chatPanel.setVisibility(View.VISIBLE);
 
-                client = new Client(
-                        MainActivity.myProfile.getsName(),
+//                Log.wtf("my", "test");
+
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.contentMain, myFragment)
+                        .commit();
+
+                MainActivity.client = new Client(getActivity(),
+                        MainActivity.myProfile,
                         etIP.getText().toString(),
                         Integer.valueOf(etPort.getText().toString()));
-                client.start();
+                MainActivity.client.start();
+
+                myDialog.dismiss();
             }
         });
 

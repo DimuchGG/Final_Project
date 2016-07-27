@@ -7,14 +7,20 @@ public class Friend {
 
     private String sName;
     private int imageID;
+    private Profile profile;
 
-    public Friend(String sName, int imageID) {
-        this.sName = sName;
-        this.imageID = imageID;
+    public Friend(Profile profile) {
+        this.sName = profile.getsName();
+        this.imageID = profile.getImageID();
+        this.profile = profile;
     }
 
     public String getsName() {
         return sName;
+    }
+
+    public Profile getProfile() {
+        return profile;
     }
 
     public int getImageID() {

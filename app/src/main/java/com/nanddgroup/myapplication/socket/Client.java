@@ -1,91 +1,97 @@
 package com.nanddgroup.myapplication.socket;
 
-import android.view.View;
-import android.widget.Toast;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.os.Build;
+import android.util.Log;
 
+import com.google.gson.Gson;
 import com.nanddgroup.myapplication.MainActivity;
+import com.nanddgroup.myapplication.MyDialog;
+import com.nanddgroup.myapplication.item_list.Message;
+import com.nanddgroup.myapplication.item_list.Profile;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Created by Dimuch on 26.07.2016.
  */
 public class Client extends Thread {
 
-    String name;
-    String dstAddress;
-    int dstPort;
+    Profile profile;
+    Message message;
+    String ipAddress;
+    int port;
+    Activity activity;
 
     String msgLog = "";
-    String msgToSend = "";
+    Message msgToSend;
     boolean goOut = false;
 
-    public Client(String name, String address, int port) {
-        this.name = name;
-        dstAddress = address;
-        dstPort = port;
+    public Client(Activity activity, Profile profile, String address, int port) {
+        this.activity = activity;
+        this.profile = profile;
+        this.ipAddress = address;
+        this.port = port;
+
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public void run() {
         Socket socket = null;
-        DataOutputStream dataOutputStream = null;
-        DataInputStream dataInputStream = null;
+        OutputStreamWriter outputStreamWriter = null;
+        InputStreamReader inputStreamReader = null;
 
         try {
-            socket = new Socket(dstAddress, dstPort);
-            dataOutputStream = new DataOutputStream(
-                    socket.getOutputStream());
-            dataInputStream = new DataInputStream(socket.getInputStream());
-            dataOutputStream.writeUTF(name);
-            dataOutputStream.flush();
+            socket = new Socket(ipAddress, port);
+            outputStreamWriter = new OutputStreamWriter (socket.getOutputStream(), StandardCharsets.UTF_8);
+            inputStreamReader = new InputStreamReader(socket.getInputStream());
+
+            Gson gson = new Gson();
+
+            String jsonRepresentation = gson.toJson(profile);
+            outputStreamWriter.write(jsonRepresentation);
+            outputStreamWriter.flush();
+
+            String jsonProfile = String.valueOf(inputStreamReader.read());
+            profile = gson.fromJson(jsonProfile, Profile.class);
 
             while (!goOut) {
-                if (dataInputStream.available() > 0) {
-                    msgLog += dataInputStream.readUTF();
+                if (true) {
+                    String jsonInputMessage = String.valueOf(inputStreamReader.read());
+                    message = gson.fromJson(jsonInputMessage, Message.class);
 
-//                    MainActivity.this.runOnUiThread(new Runnable() {
-//
-//                        @Override
-//                        public void run() {
-//                            chatMsg.setText(msgLog);
-//                        }
-//                    });
+                    activity.runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            MyDialog.myFragment.updateList(message);
+                        }
+                    });
                 }
 
-                if(!msgToSend.equals("")){
-                    dataOutputStream.writeUTF(msgToSend);
-                    dataOutputStream.flush();
-                    msgToSend = "";
+                if(true){
+                    String jsonOutputMessage = gson.toJson(msgToSend);
+                    outputStreamWriter.write(jsonOutputMessage);
+                    outputStreamWriter.flush();
                 }
             }
 
         } catch (UnknownHostException e) {
             e.printStackTrace();
             final String eString = e.toString();
-//            MainActivity.this.runOnUiThread(new Runnable() {
-//
-//                @Override
-//                public void run() {
-//                    Toast.makeText(MainActivity.this, "1" + eString, Toast.LENGTH_LONG).show();
-//                }
-//
-//            });
         } catch (IOException e) {
             e.printStackTrace();
             final String eString = e.toString();
-//            MainActivity.this.runOnUiThread(new Runnable() {
-//
-//                @Override
-//                public void run() {
-//                    Toast.makeText(MainActivity.this, "2" + eString, Toast.LENGTH_LONG).show();
-//                }
-//
-//            });
         } finally {
             if (socket != null) {
                 try {
@@ -96,39 +102,29 @@ public class Client extends Thread {
                 }
             }
 
-            if (dataOutputStream != null) {
+            if (outputStreamWriter != null) {
                 try {
-                    dataOutputStream.close();
+                    outputStreamWriter.close();
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
 
-            if (dataInputStream != null) {
+            if (inputStreamReader != null) {
                 try {
-                    dataInputStream.close();
+                    inputStreamReader.close();
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
-
-//            MainActivity.this.runOnUiThread(new Runnable() {
-//
-//                @Override
-//                public void run() {
-//                    loginPanel.setVisibility(View.VISIBLE);
-//                    chatPanel.setVisibility(View.GONE);
-//                }
-//
-//            });
         }
 
     }
 
-    public void sendMsg(String msg){
-        msgToSend = msg;
+    public void sendMsg(Message message){
+        msgToSend = message;
     }
 
     public void disconnect(){
